@@ -3,6 +3,7 @@ using System.IO;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using GPU_T.Models;
+using GPU_T.Services.Utilities;
 
 namespace GPU_T.Services.Probes.LinuxAmd;
 
@@ -35,7 +36,8 @@ public partial class LinuxAmdGpuProbe
                 }
             }
 
-            if (File.Exists(Path.Combine(_hwmonPath, "fan1_input"))) avail.HasFan = true;
+            if (File.Exists(Path.Combine(_hwmonPath, "fan1_input"))) avail.HasFanRpm = true;
+            if (File.Exists(Path.Combine(_hwmonPath, "pwm1_max")) && File.Exists(Path.Combine(_hwmonPath, "pwm1"))) avail.HasFan = true;
             if (File.Exists(Path.Combine(_hwmonPath, "power1_average")) || 
                 File.Exists(Path.Combine(_hwmonPath, "power1_input"))) avail.HasPower = true;
             if (File.Exists(Path.Combine(_hwmonPath, "in0_input"))) avail.HasVoltage = true;
@@ -124,7 +126,8 @@ public partial class LinuxAmdGpuProbe
             MemControllerLoad = memLoad,
             MemoryUsedDynamic = memGttMb,
             CpuTemperature = cpuTemp,
-            SystemRamUsed = sysRam
+            SystemRamUsed = sysRam,
+            BusInterface = GpuFeatureDetection.GetPcieInfo(_basePath)
         };
     }
 
